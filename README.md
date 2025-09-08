@@ -82,7 +82,7 @@ It is called “end-to-end” because it covers the full pipeline — from raw l
 │── Results/                  (CSV outputs from Athena)
 │── Docs/                     (documentation and report)
 └── README.md                 (main documentation)
-
+```
 ---
 
 ## Project Steps
