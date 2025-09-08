@@ -22,19 +22,6 @@ It is called “end-to-end” because it covers the full pipeline — from raw l
 - **EventBridge + SNS** → Sends real-time alerts.  
 - **QuickSight** → Visualizes activity with dashboards.
 
-```mermaid
-flowchart LR
-    A[CloudTrail] --> B[S3 Bucket (Logs)]
-    B --> C[Athena]
-    C --> D[Lambda]
-    D --> E[S3 Bucket (Query Results)]
-    E --> F[QuickSight Dashboard]
-
-    A --> G[GuardDuty]
-    G --> H[EventBridge]
-    H --> I[SNS Alerts]
-```
-
 ---
 
 ## QuickSight Dashboard
@@ -62,7 +49,7 @@ flowchart LR
 ```
 ---
 
-## Project Steps
+## How To Run
 
 ### 1. CloudTrail Setup
 - Enable CloudTrail and send logs to an S3 bucket.  
@@ -71,6 +58,7 @@ flowchart LR
 ### 2. Athena Queries
 - Create a database (`cloudtrail_logs`) and table (`cloudtrail_events`) in Athena.  
 - Run queries
+
 | Query   | Purpose                              |
 |---------|--------------------------------------|
 | 01      | Validate total CloudTrail data count |
@@ -83,6 +71,7 @@ flowchart LR
 | 08      | Track IAM changes                    |
 | 09      | Detect unusual region activity       |
 | 10      | High-risk actions                    |
+
 - Save results in CSV format.  
 
 ### 3. Lambda Automation
