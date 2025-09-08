@@ -24,28 +24,38 @@ It is called “end-to-end” because it covers the full pipeline — from raw l
 
 ---
 
-## QuickSight Dashboard
-- **Tabs / Visuals**:
-  1. **Summary KPIs**: Total Events, Failed Logins, IAM Changes.
-  2. **Activity by Region**: Donut chart + filled map using `Region` field.
-  3. **Top Source IPs**: Table of IPs sorted by event counts.
-  4. **IAM Actions**: Bar chart of IAM activity (CreateUser, AttachRolePolicy, etc.).
-  5. **Login Activity Over Time**: Line chart by day/week.
-  6. **Top Event Sources**: Bar chart of services generating events.
-
-- **Calculated Fields**: `SuccessFailure`, `Day`, `Week`, `IAMChanges`, `FailedLogins`  
-
----
-
 ## Repository Structure
 ```plaintext
 /AWS-Threat-Detection-Monitoring/
-│── Lambda/                   (Lambda function code)
-│── Athena-Queries/           (saved SQL queries)
-│── Quicksight-Screenshots/   (your dashboard screenshots)
-│── Results/                  (CSV outputs from Athena)
-│── Docs/                     (documentation and report)
-└── README.md                 (main documentation)
+│── 1-Lambda/                   (AWS Lambda function code for Athena automation)
+│    ├── lambda_function_basic.py      # Simple test function to validate Athena connectivity
+│    └── lambda_function_dynamic.py    # Dynamic function to run queries from test events
+│
+│── 2-Athena-Queries/           (SQL queries for CloudTrail log analysis)
+│    ├── 01_total_events.sql           # Validate event ingestion
+│    ├── 02_user_identity.sql          # Analyze userIdentity details
+│    ├── 05_failed_logins.sql          # Detect failed logins
+│    └── ...                           # Other queries (03–10)
+│
+|── 3-Results/                  (Outputs saved from Athena queries)                
+│     ├── total-events.csv
+│     ├── failed-logins.csv
+│     ├── iam-changes.csv
+│     └── ...                           # CSV output for all 10 queries
+|
+│── 4-Quicksight-Screenshots/   (Exports of dashboard visuals)
+│     ├── dashboard-kpis.png
+│     ├── activity-by-region.png
+│     ├── top-source-ips.png
+│     ├── iam-actions.png
+│     ├── login-over-time.png
+│     └── top-event-sources.png
+│
+│── 5-Docs/                     (Detailed documentation and report)
+│    └── Documentation.md              
+│
+└── README.md                 (Main project overview)
+
 ```
 ---
 
