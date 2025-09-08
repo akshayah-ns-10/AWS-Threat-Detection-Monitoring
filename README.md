@@ -25,7 +25,7 @@ It is called “end-to-end” because it covers the full pipeline — from raw l
 ---
 
 ## Athena Queries
-| Query # | Purpose                              |
+| Query   | Purpose                              |
 |---------|--------------------------------------|
 | 01      | Validate total CloudTrail data count |
 | 02      | Analyze `userIdentity` details       |
