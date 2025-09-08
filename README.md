@@ -22,41 +22,18 @@ It is called “end-to-end” because it covers the full pipeline — from raw l
 - **EventBridge + SNS** → Sends real-time alerts.  
 - **QuickSight** → Visualizes activity with dashboards.
 
----
+```mermaid
+flowchart LR
+    A[CloudTrail] --> B[S3 Bucket (Logs)]
+    B --> C[Athena]
+    C --> D[Lambda]
+    D --> E[S3 Bucket (Query Results)]
+    E --> F[QuickSight Dashboard]
 
-## Athena Queries
-| Query   | Purpose                              |
-|---------|--------------------------------------|
-| 01      | Validate total CloudTrail data count |
-| 02      | Analyze `userIdentity` details       |
-| 03      | Check actions being taken by users   |
-| 04      | Track sign-in events                 |
-| 05      | Detect failed logins                 |
-| 06      | List users with failed logins        |
-| 07      | Monitor root account activity        |
-| 08      | Track IAM changes                    |
-| 09      | Detect unusual region activity       |
-| 10      | High-risk actions                    |
-
----
-
-## Lambda Functions
-- `lambda_function_basic.py`: Test script to confirm Athena connectivity.
-- `lambda_function_dynamic.py`: Accepts queries via test events and executes them automatically.
-- **S3 Output**: Query results saved to `s3://athena-query-results-aksh/`.
-
----
-
-## GuardDuty
-- Findings exported to EventBridge & optionally to S3.
-- Findings were simulated and categorized into Critical, High, Medium, and Low severity levels (counts vary over time).
-- Monitored threats include: potential data compromise, EC2 DNS attacks, credential compromises, container escapes.
-
----
-
-## Alerts Example  
-- Email alerts via SNS for critical GuardDuty findings (e.g., compromised IAM user, malicious IP).  
-- Notifications grouped and filtered using EventBridge frequency rules.
+    A --> G[GuardDuty]
+    G --> H[EventBridge]
+    H --> I[SNS Alerts]
+```
 
 ---
 
@@ -93,11 +70,19 @@ It is called “end-to-end” because it covers the full pipeline — from raw l
 
 ### 2. Athena Queries
 - Create a database (`cloudtrail_logs`) and table (`cloudtrail_events`) in Athena.  
-- Run queries to detect:  
-  - Failed login attempts  
-  - IAM policy/role changes  
-  - Root account activity  
-  - Unusual region activity  
+- Run queries
+| Query   | Purpose                              |
+|---------|--------------------------------------|
+| 01      | Validate total CloudTrail data count |
+| 02      | Analyze `userIdentity` details       |
+| 03      | Check actions being taken by users   |
+| 04      | Track sign-in events                 |
+| 05      | Detect failed logins                 |
+| 06      | List users with failed logins        |
+| 07      | Monitor root account activity        |
+| 08      | Track IAM changes                    |
+| 09      | Detect unusual region activity       |
+| 10      | High-risk actions                    |
 - Save results in CSV format.  
 
 ### 3. Lambda Automation
@@ -108,7 +93,7 @@ It is called “end-to-end” because it covers the full pipeline — from raw l
 ### 4. GuardDuty
 - Enable GuardDuty.  
 - Run sample simulations (IAM compromise, S3 data exfiltration, EC2 crypto-mining).  
-- Collect findings by severity (Critical, High, Medium, Low).  
+- Collect findings by severity (Critical, High, Medium, Low).
 
 ### 5. Alerts (SNS + EventBridge)
 - Create EventBridge rules to detect GuardDuty findings.  
