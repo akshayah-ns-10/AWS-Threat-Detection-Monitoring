@@ -75,7 +75,7 @@ It is called “end-to-end” because it covers the full pipeline — from raw l
 
 ## Repository Structure
 ```plaintext
-/aws-threat-detection/
+/AWS-Threat-Detection-Monitoring/
 │── Lambda/                   (Lambda function code)
 │── Athena-Queries/           (saved SQL queries)
 │── Quicksight-Screenshots/   (your dashboard screenshots)
