@@ -15,6 +15,53 @@ It is called “end-to-end” because it covers the full pipeline — from raw l
 ---
 
 ## Architecture
+                      ┌─────────────┐
+                      │ CloudTrail  │
+                      │  (Logs all  │
+                      │  AWS events)│
+                      └─────┬──────┘
+                            │
+                            ▼
+                      ┌─────────────┐
+                      │    S3       │
+                      │ (Log storage)
+                      └─────┬──────┘
+                            │
+            ┌───────────────┼─────────────────┐
+            │                               │
+            ▼                               ▼
+      ┌─────────────┐                 ┌───────────────┐
+      │  Athena     │                 │ GuardDuty     │
+      │  (Runs SQL  │                 │ (Detects     │
+      │  queries on │                 │ threats &    │
+      │  CloudTrail │                 │ anomalies)   │
+      │  logs)      │                 └─────┬────────┘
+      └─────┬──────┘                       │
+            │                               │
+            ▼                               ▼
+      ┌─────────────┐                 ┌───────────────┐
+      │  Lambda     │                 │ Security Hub  │
+      │  (Automates │                 │ (Consolidates│
+      │  Athena     │                 │  GuardDuty & │
+      │  queries,   │                 │  other findings)
+      │  saves CSV) │                 └─────┬────────┘
+      └─────┬──────┘                       │
+            │                               │
+            └───────────────┬───────────────┘
+                            ▼
+                      ┌─────────────┐
+                      │ EventBridge │
+                      │ + SNS       │
+                      │ (Alerts)    │
+                      └─────┬──────┘
+                            │
+                            ▼
+                      ┌─────────────┐
+                      │ QuickSight  │
+                      │ (Dashboards │
+                      │  & KPIs)    │
+                      └─────────────┘
+
 - **CloudTrail** → Logs all AWS account activity to S3.  
 - **Athena** → Runs SQL queries on CloudTrail logs.  
 - **Lambda** → Automates queries on a schedule/test event and stores structured results in S3.  
