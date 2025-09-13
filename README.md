@@ -1,146 +1,148 @@
 # End-to-End AWS Threat Detection & Monitoring System
 
 ## Project Overview
-This project implements an end-to-end cloud threat detection and monitoring system on AWS.  
-It is called “end-to-end” because it covers the full pipeline — from raw log collection (CloudTrail) to automated detection (Athena/Lambda), continuous monitoring (GuardDuty), real-time alerts (EventBridge/SNS), and visualization (QuickSight).  
+This project implements a **fully automated cloud threat detection and monitoring system** on AWS.  
+It covers the full security pipeline — from **raw log collection** (CloudTrail) to **automated detection** (Athena + Lambda), **continuous monitoring** (GuardDuty + Security Hub), **real-time alerts** (EventBridge + SNS), and **visualization** (QuickSight).
 
 ---
 
 ## Features
-- Automated detection of unusual login activity and high-risk actions.
-- Real-time alerts via SNS/EventBridge.
-- Visual dashboards in QuickSight for security monitoring.
-- Tested against multiple IAM roles and network scenarios.
+- **Automated detection** of unusual login activity, high-risk actions, and resource changes.  
+- **Event-driven alerts** through EventBridge + SNS.  
+- **Visualization dashboards** in QuickSight for monitoring critical metrics.  
+- **Simulated GuardDuty findings** for anomaly detection (IAM compromise, S3 exfiltration, EC2 compromise).  
+- **Scheduled Lambda automation** to fetch and run Athena queries periodically.  
+- Fully **end-to-end SOC pipeline** demonstration for learning and documentation purposes.
 
 ---
 
 ## Architecture
-- **CloudTrail** → Logs all AWS account activity to S3.  
-- **Athena** → Runs SQL queries on CloudTrail logs.  
-- **Lambda** → Automates queries on a schedule/test event and stores structured results in S3.  
-- **GuardDuty** → Detects malicious activity and anomalies.  
-- **EventBridge + SNS** → Sends real-time alerts.  
-- **QuickSight** → Visualizes activity with dashboards.
+CloudTrail → S3 → Athena → Lambda → EventBridge (schedules queries) → S3 (results) → QuickSight
+          ↘ GuardDuty → Security Hub → EventBridge (alerts) → SNS → Notifications
 
----
-
-## QuickSight Dashboard
-- **Tabs / Visuals**:
-  1. **Summary KPIs**: Total Events, Failed Logins, IAM Changes.
-  2. **Activity by Region**: Donut chart + filled map using `Region` field.
-  3. **Top Source IPs**: Table of IPs sorted by event counts.
-  4. **IAM Actions**: Bar chart of IAM activity (CreateUser, AttachRolePolicy, etc.).
-  5. **Login Activity Over Time**: Line chart by day/week.
-  6. **Top Event Sources**: Bar chart of services generating events.
-
-- **Calculated Fields**: `SuccessFailure`, `Day`, `Week`, `IAMChanges`, `FailedLogins`  
+ - CloudTrail → S3: Raw log collection.
+ - Athena → Lambda → EventBridge → S3: Automated detection; EventBridge schedules Lambda to run queries periodically.
+ - QuickSight: Visualizes Athena query results.
+ - GuardDuty → Security Hub → EventBridge → SNS: Detects anomalies and high-risk activity, sends real-time alerts.
 
 ---
 
 ## Repository Structure
-```plaintext
-/AWS-Threat-Detection-Monitoring/
-│── Lambda/                   (Lambda function code)
-│── Athena-Queries/           (saved SQL queries)
-│── Quicksight-Screenshots/   (your dashboard screenshots)
-│── Results/                  (CSV outputs from Athena)
-│── Docs/                     (documentation and report)
-└── README.md                 (main documentation)
+
+```text
+/aws-threat-detection-monitoring/
+│── 1-Athena-Queries/              (SQL queries for CloudTrail analysis)
+│     ├── 1-FailedLogins.sql
+│     ├── 2-IAMChanges.sql
+│     └── ...                      # Other queries
+│
+│── 2-Lambda/                      (Lambda functions for automation and Security Hub export)
+│     ├── ThreatDetectionMonitoringLambda-aksh/
+│     └── SecurityHub-s3/
+│
+│── 3-Athena-Results/              (CSV outputs generated from Athena query runs)
+│     ├── 1-FailedLogins.csv
+│     ├── 2-IAMChanges.csv
+│     └── ...                      # Result files for all queries
+│
+│── 4-QuickSight-Screenshots/      (Exports of the 6 QuickSight dashboard visuals)
+│     ├── 1-FailedLogins_Screenshot.png
+│     ├── 2-IAMChanges_Screenshot.png
+│     ├── 3-Region_Screenshot.png
+│     ├── 4-TopSourceIPs_Screenshot.png
+│     ├── 5-ErrorCode_Screenshot.png
+│     └── 6-UserAgent_Screenshot.png
+│
+│── 5-Docs/
+│     └── Documentation.docx       (Detailed documentation)
+│
+└── README.md                      (Main project overview and instructions)
 ```
+
 ---
 
 ## How To Run
 
 ### 1. CloudTrail Setup
-- Enable CloudTrail and send logs to an S3 bucket.  
-- Confirm events are arriving in the S3 bucket.  
+- Enable CloudTrail for all regions.
+- Ensure logs are delivered to your S3 bucket.
 
 ### 2. Athena Queries
-- Create a database (`cloudtrail_logs`) and table (`cloudtrail_events`) in Athena.  
-- Run queries
-
-| Query   | Purpose                              |
-|---------|--------------------------------------|
-| 01      | Validate total CloudTrail data count |
-| 02      | Analyze `userIdentity` details       |
-| 03      | Check actions being taken by users   |
-| 04      | Track sign-in events                 |
-| 05      | Detect failed logins                 |
-| 06      | List users with failed logins        |
-| 07      | Monitor root account activity        |
-| 08      | Track IAM changes                    |
-| 09      | Detect unusual region activity       |
-| 10      | High-risk actions                    |
-
-- Save results in CSV format.  
+- Use the `cloudtrail_logs` database and `cloudtrail_events` table.
+- Place SQL files in the S3 folder `Athena-Queries`.
+- **Core queries include:**
+  1. Failed Logins / Brute Force Detection
+  2. IAM Policy/Role Changes
+  3. Root Account Usage
+  4. Unusual Region Access
+  5. Suspicious API Calls / High-Risk Actions
+  6. Multiple Resource Deletions / Bulk Suspicious Changes
+  7. Error Codes Analysis
+  8. Top Source IPs
+- Save Athena query results as CSV in S3 (`Athena-Results`).
 
 ### 3. Lambda Automation
-- Deploy a Lambda function to execute Athena queries automatically.  
-- Store query results in a separate S3 bucket.  
-- Configure event payloads to test different queries.  
+- Deploy a Lambda function to **dynamically read SQL files from S3**.
+- Run queries automatically on a schedule using **EventBridge** (e.g., every 15 minutes).
+- Store results in S3 (`Lambda-Results`) automatically.
+- This provides **end-to-end automation** without manual query execution.
 
-### 4. GuardDuty
-- Enable GuardDuty.  
-- Run sample simulations (IAM compromise, S3 data exfiltration, EC2 crypto-mining).  
-- Collect findings by severity (Critical, High, Medium, Low).
+### 4. GuardDuty & Security Hub
+- Enable GuardDuty to detect threats like IAM compromise, S3 exfiltration, EC2 compromise.
+- Enable Security Hub to consolidate findings.
+- Security Hub findings can be optionally stored in S3 and visualized in QuickSight.
 
-### 5. Alerts (SNS + EventBridge)
-- Create EventBridge rules to detect GuardDuty findings.  
-- Forward alerts to an SNS topic.  
-- Subscribe with email or SMS to receive notifications.  
+### 5. EventBridge + SNS Alerts
+- Create EventBridge rules to capture GuardDuty findings.
+- Forward alerts to an SNS topic.
+- Subscribe via email/SMS to receive notifications in real-time.
 
 ### 6. QuickSight Dashboard
-- Connect QuickSight to Athena workgroup.  
-- Create calculated fields:  
-  - `SuccessFailure`  
-  - `Day`  
-  - `Week`
-  - `IAMChanges`
-  - `FailedLogins`   
-- Build visuals:  
-  - KPIs (Total Events, Failed Logins, IAM Changes)  
-  - Activity by Region (donut chart + filled map)  
-  - Top Source IPs (table)  
-  - IAM Actions (bar chart)  
-  - Login Activity Over Time (line chart)  
-  - Top Event Sources (bar chart)  
+- Connect QuickSight to the Athena workgroup (`cloudtrail_logs`) and S3 datasets.
+- Build visuals:
+  - Failed Logins by Source IP
+  - IAM Changes
+  - Unusual Region Access
+  - Top Source IPs
+  - Error Code Distribution
+  - User Agent Breakdown
 
 ---
 
 ## Results
+**Key metrics from the current run (example from Sept 2025):**  
+- Total Events: 31,100+  
+- Failed Logins: 44  
+- IAM Changes: 71
+    - Includes only: CreateUser, DeleteUser, AttachRolePolicy, DetachRolePolicy  
+- Error Codes Observed: 20+ distinct errors (ResourceNotFoundException, AccessDenied, InvalidRequestException)  
+- GuardDuty & Security Hub Findings: Simulated alerts confirmed detection of IAM credential misuse, S3 data compromise, and EC2 compromise attempts  
 
-Key metrics from the final snapshot (Sept 2025):
-
-- **Total Events:** 10,313  
-- **Failed Logins:** 480  
-- **IAM Changes (subset):** 49  
-   - Includes only: `CreateUser`, `DeleteUser`, `CreateRole`,  `AttachRolePolicy`, `DetachRolePolicy`  
-- **Error Codes Observed:** 20+ distinct errors (e.g., `ResourceNotFoundException`, `AccessDenied`, `InvalidRequestException`). Diversity of error codes shows visibility into authentication issues, missing permissions, and API misuse.  
-- **GuardDuty Findings:** Simulated alerts confirmed detection of IAM credential misuse, S3 data compromise and EC2 compromise attempts  
-
-**Note:** The values above are from a specific run (Sept 2025). Since this pipeline works on live CloudTrail logs and GuardDuty findings, the actual numbers will naturally change over time.
+> Note: Values are from a specific run. The pipeline works on **live CloudTrail logs**, so numbers will naturally change over time.
 
 ---
 
 ## Future Improvements
-- Add anomaly detection using Amazon Detective.  
-- Integrate SIEM tools like Splunk/ELK for hybrid monitoring.  
-- Automate dashboard refresh and alerting pipeline.
+- Add **anomaly detection** using Amazon Detective or ML models.
+- Integrate **SIEM tools** (Splunk, ELK) for hybrid monitoring.
+- Automate **dashboard refresh** and alerting pipeline.
 
 ---
 
 ## Notes
-- All experiments are performed in a safe AWS account.
-- Failed executions and mistakes (workgroup issues, S3 permissions) were resolved during testing.
-- IAM policies were updated to allow Lambda & QuickSight access to necessary S3 buckets.
+- All experiments were performed in a safe AWS account.  
+- Errors during setup (permissions, workgroup issues) were resolved.  
+- IAM policies were updated to allow Lambda & QuickSight access to S3 buckets.  
 
 ---
 
 ## License
-This project is for educational purposes. No real data or sensitive information was used. Do not use it in production without proper security hardening.  
+- This project is for **educational purposes**. No real or sensitive data was used.  
+- Do not use in production without **proper security hardening**.
 
 ---
 
-**Author**: Akshayah N S (Sept 2025)
+## Author
+Akshayah N S (Sept 2025)
 
 
