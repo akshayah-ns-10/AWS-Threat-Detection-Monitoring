@@ -60,14 +60,6 @@ CloudTrail → S3 → Athena → Lambda → EventBridge (schedules queries) → 
 │
 └── README.md                      (Main project overview and instructions)
 ```
-
-- **CloudTrail** → Logs all AWS account activity to S3.  
-- **Athena** → Runs SQL queries on CloudTrail logs.  
-- **Lambda** → Automates queries on a schedule/test event and stores structured results in S3.  
-- **GuardDuty** → Detects malicious activity and anomalies.  
-- **EventBridge + SNS** → Sends real-time alerts.  
-- **QuickSight** → Visualizes activity with dashboards.
-
 ---
 
 ## How To Run
