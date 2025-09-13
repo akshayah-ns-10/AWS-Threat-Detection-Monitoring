@@ -77,7 +77,7 @@ Purpose: Identify critical IAM role or policy changes.
 
 Links to Queries in Repo:
  - [Root Account Usage](../1-Athena-Queries/3-RootAccntUsage.sql)
- - [Unusual Region Access](../1-Athena-Queries/4RegionAccess.sql)  
+ - [Unusual Region Access](../1-Athena-Queries/4-RegionAccess.sql)  
  - [High Risk Actions](../1-Athena-Queries/5-HighRiskActions.sql)  
  - … (other queries are in the folder)
 
@@ -178,7 +178,7 @@ These metrics update automatically as logs and detections evolve.
 
 ## 12. Repository Structure
 ```text
-/aws-threat-detection-monitoring/
+/AWS-Threat-Detection-Monitoring/
 │── 1-Athena-Queries/              (SQL queries for CloudTrail analysis)
 │     ├── 1-FailedLogins.sql
 │     ├── 2-IAMChanges.sql
@@ -202,7 +202,7 @@ These metrics update automatically as logs and detections evolve.
 │     └── 6-UserAgent_Screenshot.png
 │
 │── 5-Docs/
-│     └── Documentation.docx       (Detailed documentation)
+│     └── Documentation.md       (Detailed documentation)
 │
 └── README.md                      (Main project overview and instructions)
 ```
