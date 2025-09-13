@@ -17,8 +17,10 @@ It covers the full security pipeline — from **raw log collection** (CloudTrail
 ---
 
 ## Architecture
+```plaintext
 CloudTrail → S3 → Athena → Lambda → EventBridge (schedules queries) → S3 (results) → QuickSight
           ↘ GuardDuty → Security Hub → EventBridge (alerts) → SNS → Notifications
+```
 
  - CloudTrail → S3: Raw log collection.
  - Athena → Lambda → EventBridge → S3: Automated detection; EventBridge schedules Lambda to run queries periodically.
@@ -58,6 +60,13 @@ CloudTrail → S3 → Athena → Lambda → EventBridge (schedules queries) → 
 │
 └── README.md                      (Main project overview and instructions)
 ```
+
+- **CloudTrail** → Logs all AWS account activity to S3.  
+- **Athena** → Runs SQL queries on CloudTrail logs.  
+- **Lambda** → Automates queries on a schedule/test event and stores structured results in S3.  
+- **GuardDuty** → Detects malicious activity and anomalies.  
+- **EventBridge + SNS** → Sends real-time alerts.  
+- **QuickSight** → Visualizes activity with dashboards.
 
 ---
 
