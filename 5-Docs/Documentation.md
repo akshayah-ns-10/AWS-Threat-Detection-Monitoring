@@ -6,9 +6,9 @@
 
 This project implements a fully automated cloud threat detection and monitoring pipeline on AWS.  
 The flow is truly end-to-end:
-
+```plaintext
 CloudTrail → S3 → Athena → Lambda → GuardDuty → Security Hub → EventBridge/SNS → QuickSight dashboards
-
+```
 It’s called "end-to-end" because it covers **raw log collection**, **automated detection**, **continuous monitoring**, **real-time alerts**, and **visualization**.
 
 ### Why Athena + Lambda + GuardDuty?
@@ -76,9 +76,9 @@ Purpose: Identify critical IAM role or policy changes.
 **SQL files are stored in `/1-Athena-Queries/` in the repo.**
 
 Links to Queries in Repo:
- - [Root Account Usage](1-Athena-Queries/3-RootAccntUsage.sql)
- - [Unusual Region Access](1-Athena-Queries/4RegionAccess.sql)  
- - [High Risk Actions](1-Athena-Queries/5-HighRiskActions.sql)  
+ - [Root Account Usage](../1-Athena-Queries/3-RootAccntUsage.sql)
+ - [Unusual Region Access](../1-Athena-Queries/4-RegionAccess.sql)  
+ - [High Risk Actions](../1-Athena-Queries/5-HighRiskActions.sql)  
  - … (other queries are in the folder)
 
 
@@ -86,8 +86,8 @@ Links to Queries in Repo:
 
 ## 4. Lambda Functions
 **Lambda Functions Used:**
- - **ThreatDetectionMonitoringLambda-aksh** → Automates Athena queries and saves CSV results to S3.
- - **SecurityHub-s3** → Captures Security Hub findings and stores them in S3.
+ - **`ThreatDetectionMonitoringLambda-aksh`** → Automates Athena queries and saves CSV results to S3.
+ - **`SecurityHub-s3`** → Captures Security Hub findings and stores them in S3.
 
 ### How They Work:
  - Lambda reads SQL files dynamically from `Athena-Queries` in S3.
@@ -152,14 +152,14 @@ GuardDuty → Security Hub → EventBridge Rule → SNS → Email/SMS
 
 **Visuals Built (6)**
 
-| Visual Name                   | Fields Used (X-axis, Value)      | Chart Type       | Extra Touch                          | Screenshot                                                           |
-|-------------------------------|----------------------------------|------------------|--------------------------------------|----------------------------------------------------------------------|
-| Failed Logins                 | sourceipaddress, count()         | Bar Chart + KPI  | Filter: eventname='ConsoleLogin'     |![Screenshot](4-QuickSight-Screenshots/1-FailedLogins_Screenshot.png) |
-| IAM Changes/High-Risk Actions | eventname, count()               | Bar Chart + KPI  | Filter: critical IAM actions         |![Screenshot](4-QuickSight-Screenshots/2-IAMChanges_Screenshot.png)   |
-| Access by AWS Region          | awsregion, count()               | Bar Chart        | Highlight unexpected regions         |![Screenshot](4-QuickSight-Screenshots/3-Region_Screenshot.png)       |
-| Top Source IPs                | sourceipaddress, count()         | Bar Chart        | Conditional formatting for repeats   |![Screenshot](4-QuickSight-Screenshots/4-TopSourceIPs_Screenshot.png) |
-| Error Code Distribution       | errorcode, count()               | Pie Chart        | Shows common errors                  |![Screenshot](4-QuickSight-Screenshots/5-ErrorCode_Screenshot.png)    |
-| User Agent Breakdown          | useragent, count()               | Horizontal Bar   | Compare API usage patterns           |![Screenshot](4-QuickSight-Screenshots/6-UserAgent_Screenshot.png)    |
+| Visual Name                   | Fields Used (X-axis, Value)      | Chart Type       | Extra Touch                          | Screenshot                                                              |
+|-------------------------------|----------------------------------|------------------|--------------------------------------|-------------------------------------------------------------------------|
+| Failed Logins                 | sourceipaddress, count()         | Bar Chart + KPI  | Filter: eventname='ConsoleLogin'     |![Screenshot](../4-QuickSight-Screenshots/1-FailedLogins_Screenshot.png) |
+| IAM Changes/High-Risk Actions | eventname, count()               | Bar Chart + KPI  | Filter: critical IAM actions         |![Screenshot](../4-QuickSight-Screenshots/2-IAMChanges_Screenshot.png)   |
+| Access by AWS Region          | awsregion, count()               | Bar Chart        | Highlight unexpected regions         |![Screenshot](../4-QuickSight-Screenshots/3-Region_Screenshot.png)       |
+| Top Source IPs                | sourceipaddress, count()         | Bar Chart        | Conditional formatting for repeats   |![Screenshot](../4-QuickSight-Screenshots/4-TopSourceIPs_Screenshot.png) |
+| Error Code Distribution       | errorcode, count()               | Pie Chart        | Shows common errors                  |![Screenshot](../4-QuickSight-Screenshots/5-ErrorCode_Screenshot.png)    |
+| User Agent Breakdown          | useragent, count()               | Horizontal Bar   | Compare API usage patterns           |![Screenshot](../4-QuickSight-Screenshots/6-UserAgent_Screenshot.png)    |
 
 ---
 
@@ -178,7 +178,7 @@ These metrics update automatically as logs and detections evolve.
 
 ## 12. Repository Structure
 ```text
-/aws-threat-detection-monitoring/
+/AWS-Threat-Detection-Monitoring/
 │── 1-Athena-Queries/              (SQL queries for CloudTrail analysis)
 │     ├── 1-FailedLogins.sql
 │     ├── 2-IAMChanges.sql
@@ -202,7 +202,7 @@ These metrics update automatically as logs and detections evolve.
 │     └── 6-UserAgent_Screenshot.png
 │
 │── 5-Docs/
-│     └── Documentation.docx       (Detailed documentation)
+│     └── Documentation.md       (Detailed documentation)
 │
 └── README.md                      (Main project overview and instructions)
 ```
